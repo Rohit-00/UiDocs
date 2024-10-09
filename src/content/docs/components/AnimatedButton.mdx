@@ -1,0 +1,215 @@
+---
+title: Animated Button
+description: A reference page in my new Starlight docs site.
+---
+
+A button which changes it's appearance if tapped
+
+
+
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Code } from '@astrojs/starlight/components';
+
+export const exampleCode = `import { StyleSheet, Text, View } from 'react-native'
+import React from 'react'
+import { AnimatedSubscribeButton } from '../components/animatedButton'
+
+const App = () => {
+  return (
+    <View>
+
+      <AnimatedSubscribeButton
+  buttonColor="#000000"
+  buttonTextColor="#ffffff"
+  subscribeStatus={false}
+  initialText="Subscribe"
+  changeText="Subscribed"
+      />
+
+    </View>
+  )}
+
+export default App`;
+export const fileName = 'App.tsx';
+export const highlights = ['file', 'CMS'];
+
+<Tabs>
+  <TabItem label="Preview"><img src="https://i.ibb.co/7YhGL6P/Animated-Button-ezgif-com-video-to-webp-converter.webp" alt="Alt text" height="400" width="200" 
+  style={{ display: 'block', margin: '0 auto' }}/>
+</TabItem>
+  <TabItem label="Code"><Code code={exampleCode} lang="js" title={fileName} mark={highlights} /></TabItem>
+</Tabs>
+
+## Installation
+
+import { Steps } from '@astrojs/starlight/components';
+
+<Steps>
+  1. **Install React Native Reanimated**
+     <Tabs>
+       <TabItem label="NPM">
+          ```bash
+         npm install react-native-reanimated
+         ```
+       </TabItem>
+       <TabItem label="YARN">
+         ```bash
+        yarn add react-native-reanimated
+         ```
+       </TabItem>
+       <TabItem label="EXPO">
+         ```bash
+        npx expo install react-native-reanimated
+         ```
+       </TabItem>
+     </Tabs>
+  2. **Add Reanimated plugin into babel.config file**
+      ```js
+        module.exports = {
+          presets: [
+            ... // don't add it here :)
+          ],
+          plugins: [
+            ...
+            'react-native-reanimated/plugin',
+          ],
+        };
+      ```
+  3. **Wrap your app in `<GestureHandlerRootView>`**
+      ```tsx
+        export default function App() {
+
+          return (            
+        <GestureHandlerRootView >
+          {/* Component goes here */}
+        </GestureHandlerRootView>
+
+          );
+        }
+      ```
+
+  4. **Copy core component `src/components/AnimatedButton.tsx`**
+     ```tsx
+        import React, { useState } from 'react';
+        import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+        import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
+
+        interface AnimatedSubscribeButtonProps {
+          buttonColor: string;
+          buttonTextColor?: string;
+          subscribeStatus: boolean;
+          initialText: React.ReactElement | string;
+          changeText: React.ReactElement | string;
+          buttonWidth?:number
+        }
+
+        export const AnimatedSubscribeButton: React.FC<AnimatedSubscribeButtonProps> = ({
+          buttonColor,
+          subscribeStatus = false,
+          buttonTextColor = '#fff',
+          initialText,
+          changeText,
+          buttonWidth
+        }) => {
+          const [isSubscribed, setIsSubscribed] = useState<boolean>(subscribeStatus);
+
+          // Shared value for the opacity animation
+          const opacity = useSharedValue(1);
+          const translateY = useSharedValue(0);
+
+          // Animate styles based on the subscription status
+          const animatedButtonStyle = useAnimatedStyle(() => {
+            return {
+              opacity: withTiming(opacity.value, { duration: 300 }),
+            };
+          });
+
+          const animatedTextStyle = useAnimatedStyle(() => {
+            return {
+              transform: [{ translateY: withTiming(translateY.value, { duration: 300 }) }],
+            };
+          });
+
+          const handlePress = () => {
+            // Trigger animation and toggle subscription state
+            opacity.value = 0; // Fade out
+            translateY.value = -50; // Move text up
+
+            setTimeout(() => {
+              setIsSubscribed(!isSubscribed);
+              opacity.value = 1; // Fade in
+              translateY.value = 0; // Move text back to original position
+            }, 300);
+          };
+
+          return (
+            <Animated.View style={[styles.buttonContainer,{width:buttonWidth||200}]}>
+              <TouchableOpacity
+                onPress={handlePress}
+                style={[
+                  styles.button,
+                  { backgroundColor: isSubscribed ? '#fff' : buttonColor, borderColor: buttonColor },
+                ]}
+                activeOpacity={1}
+              >
+                <Animated.View style={[animatedButtonStyle, animatedTextStyle]}>
+                  {isSubscribed ? (
+                    <View style={styles.textContainer}>
+                      <Text style={[styles.buttonText, { color: buttonColor }]}>{changeText}</Text>
+                    </View>
+                  ) : (
+                    <View style={styles.textContainer}>
+                      <Text style={[styles.buttonText, { color: buttonTextColor }]}>{initialText}</Text>
+                    </View>
+                  )}
+                </Animated.View>
+              </TouchableOpacity>
+            </Animated.View>
+          );
+        };
+
+        // Styles for the component
+        const styles = StyleSheet.create({
+          buttonContainer: {
+            borderRadius: 8,
+            justifyContent: 'center',
+            alignItems: 'center',
+            overflow: 'hidden',
+          },
+          button: {
+            width: '100%',
+            height: 50,
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderWidth: 1,
+            borderRadius: 8,
+          },
+          textContainer: {
+            flexDirection: 'row',
+            alignItems: 'center',
+          },
+          buttonText: {
+            fontWeight: '600',
+            fontSize: 16,
+          },
+        });
+
+
+     ```
+    
+</Steps>
+
+ 
+
+
+## Props
+
+| Prop      | Type     | Description                          |
+|-------------|----------|--------------------------------------|
+| `buttonColor`| `string` | Color of the button.    |
+| `buttonTextColor`| `string` | Color of button Text.      |
+| `subscribeStatus`| `boolean`| state of the button(subscribed/unsubscribed).       |
+| `initialText`| `string` | First text of button .|
+| `changeText`| `string` | Text that will appear after state change .|
+

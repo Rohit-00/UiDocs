@@ -1,0 +1,43 @@
+---
+const images = [
+  { src: 'https://i.ibb.co/mzBbB9m/Tinder-Swipe-Card-ezgif-com-video-to-webp-converter.webp', alt: 'TinderCards', link: '/components/animatedlist' },
+  { src: 'https://i.ibb.co/Rj1qj2Q/Floating-Action-Button-ezgif-com-video-to-webp-converter.webp', alt: 'FAB', link: '/components/animatedlist' },
+  { src: 'https://i.ibb.co/nRyDfw3/Credit-Card-ezgif-com-video-to-webp-converter.webp', alt: 'CreditCard', link: '/components/animatedlist' },
+  { src: 'https://i.ibb.co/GsSFXyz/Animated-Listt-ezgif-com-video-to-webp-converter-1.webp', alt: 'AnimatedList', link: '/components/animatedlist' },
+  { src: 'https://i.ibb.co/7YhGL6P/Animated-Button-ezgif-com-video-to-webp-converter.webp', alt: 'AnimatedList', link: '/components/animatedlist' },
+  { src: 'https://i.ibb.co/SQXT9gL/Multi-Step-Loader-ezgif-com-video-to-webp-converter.webp', alt: 'AnimatedList', link: '/components/animatedlist' },
+
+];
+---
+<style>
+  .grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    padding: 1rem;
+  }
+  .grid-item {
+    overflow: hidden;
+    border-radius: 8px;
+    transition: transform 0.2s;
+  }
+
+  .grid-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  @media (max-width: 600px) {
+    .grid-container {
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
+  }
+</style>
+
+<div class="grid-container">
+  {images.map(image => (
+    <a href={image.link} class="grid-item">
+      <img src={image.src} alt={image.alt} loading="lazy" width="300" height="200" />
+    </a>
+  ))}
+</div>
