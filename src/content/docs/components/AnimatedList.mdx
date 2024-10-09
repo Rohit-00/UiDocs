@@ -1,9 +1,9 @@
 ---
-title: Credit Card
+title: Animated List
 description: A reference page in my new Starlight docs site.
 ---
 
-A button which changes it's appearance if tapped
+Create dynamic, fluid scrolling lists with our easy-to-integrate Animated List component.
 
 
 
@@ -121,120 +121,158 @@ import { Steps } from '@astrojs/starlight/components';
 
           return (            
         <GestureHandlerRootView >
-          {/* Component goes here */}
+          {/* Rest of the code */}
         </GestureHandlerRootView>
 
           );
         }
       ```
 
-  4. **Copy core component `src/components/AnimatedButton.tsx`**
+  4. **Copy core component `src/components/AnimatedList.tsx`**
      ```tsx
-        import React, { useState } from 'react';
-        import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-        import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
+        import { View,FlatList, ViewToken, Dimensions } from 'react-native'
+        import Animated, {useAnimatedStyle, useSharedValue, withTiming , SharedValue, withSpring} from 'react-native-reanimated'
+        import React from 'react'
 
-        interface AnimatedSubscribeButtonProps {
-          buttonColor: string;
-          buttonTextColor?: string;
-          subscribeStatus: boolean;
-          initialText: React.ReactElement | string;
-          changeText: React.ReactElement | string;
-          buttonWidth?:number
+        const { height : deviceHeight , width : deviceWidth } = Dimensions.get('window')
+
+        interface MyComponentProps {
+          data:any[],
+          ItemStyle:React.ElementType,
+          animation?:string
         }
 
-        export const AnimatedSubscribeButton: React.FC<AnimatedSubscribeButtonProps> = ({
-          buttonColor,
-          subscribeStatus = false,
-          buttonTextColor = '#fff',
-          initialText,
-          changeText,
-          buttonWidth
-        }) => {
-          const [isSubscribed, setIsSubscribed] = useState<boolean>(subscribeStatus);
+        const AnimatedList :React.FC<MyComponentProps>  = ({data,ItemStyle,animation}) => {
+        
+        const viewableItems = useSharedValue<ViewToken[]>([])
+        let viewTable:ViewToken[] = []
 
-          // Shared value for the opacity animation
-          const opacity = useSharedValue(1);
-          const translateY = useSharedValue(0);
+        return (
+        <View>
+        <FlatList
+                data={data}
+                onViewableItemsChanged={({viewableItems:vItem})=>{           
+                    viewTable=[...viewTable,...vItem]
+                    viewableItems.value = viewTable
+                    // viewableItems.value = vItem
+                }
+                }
+                renderItem={({item})=>{
+                return <ListItem item={item} viewableItems={viewableItems} ItemStyle={ItemStyle} animation={animation} />}}
+                keyExtractor={item => item.id}  
+                showsVerticalScrollIndicator={false}   
+              />
 
-          // Animate styles based on the subscription status
-          const animatedButtonStyle = useAnimatedStyle(() => {
-            return {
-              opacity: withTiming(opacity.value, { duration: 300 }),
+        </View>
+            )
+          }
+
+        type ListItemProps = {
+            viewableItems: SharedValue<ViewToken[]>;
+            item:{
+                name:string,
+                age:number
             };
-          });
+            ItemStyle:React.ElementType,
+            animation?:string
+        }
 
-          const animatedTextStyle = useAnimatedStyle(() => {
-            return {
-              transform: [{ translateY: withTiming(translateY.value, { duration: 300 }) }],
-            };
-          });
+        const ListItem:React.FC<ListItemProps>  = React.memo(
+            
+            ({item,viewableItems,ItemStyle,animation})=>{
+            
+            const animatedStyle = useAnimatedStyle(()=>{
 
-          const handlePress = () => {
-            // Trigger animation and toggle subscription state
-            opacity.value = 0; // Fade out
-            translateY.value = -50; // Move text up
+                const isVisible =Boolean( viewableItems.value.filter((item:any)=>item.isViewable)
+                .find((viewableItem:any)=>viewableItem.item.name===item.name))
+                
+                switch(animation){
 
-            setTimeout(() => {
-              setIsSubscribed(!isSubscribed);
-              opacity.value = 1; // Fade in
-              translateY.value = 0; // Move text back to original position
-            }, 300);
-          };
+                    case 'slide-left':
+                        return{
+                
+                            transform:[
+                            {
+                                translateX:withTiming(isVisible?0:deviceWidth)
+                                
+                            },
+                            ]
+                        }
+                    case 'slide-right':
+                        return{
+                
+                            transform:[
+                            {
+                                translateX:withTiming(isVisible?0:-deviceWidth)
+                                
+                            },
+                            ]
+                        }
+                    case 'slide-left-spring':
+                        return{
+                
+                            transform:[
+                            {
+                                translateX:withSpring(isVisible?0:deviceWidth)
+                                
+                            },
+                            ]
+                        }
+                    case 'slide-right-spring':
+                        return{
+                
+                            transform:[
+                            {
+                                translateX:withSpring(isVisible?0:-deviceWidth)
+                                
+                            },
+                            ]
+                        }
+                        
+                    case 'bottom-up':
+                        return{
+                
+                            transform:[
+                            {
+                                translateY:withTiming(isVisible?0:100)
+                                
+                            },
+                            ]
+                        }
+                    case 'bottom-up-spring':
+                        return{
+                
+                            transform:[
+                            {
+                                translateY:withSpring(isVisible?0:deviceHeight)
+                                
+                            },
+                            ]
+                        }
 
-          return (
-            <Animated.View style={[styles.buttonContainer,{width:buttonWidth||200}]}>
-              <TouchableOpacity
-                onPress={handlePress}
-                style={[
-                  styles.button,
-                  { backgroundColor: isSubscribed ? '#fff' : buttonColor, borderColor: buttonColor },
-                ]}
-                activeOpacity={1}
-              >
-                <Animated.View style={[animatedButtonStyle, animatedTextStyle]}>
-                  {isSubscribed ? (
-                    <View style={styles.textContainer}>
-                      <Text style={[styles.buttonText, { color: buttonColor }]}>{changeText}</Text>
-                    </View>
-                  ) : (
-                    <View style={styles.textContainer}>
-                      <Text style={[styles.buttonText, { color: buttonTextColor }]}>{initialText}</Text>
-                    </View>
-                  )}
+                        default:
+                            return{
+                                transform:[
+                                    {
+                                        scale:withTiming(isVisible?1:deviceHeight)
+                                        
+                                    },
+                                  ]
+                            }
+                }
+                    
+                
+            })
+                return(
+                <Animated.View style={[animatedStyle]}>
+                    <ItemStyle item={item} />
                 </Animated.View>
-              </TouchableOpacity>
-            </Animated.View>
-          );
-        };
+                )
+            }
+          
+        )
 
-        // Styles for the component
-        const styles = StyleSheet.create({
-          buttonContainer: {
-            borderRadius: 8,
-            justifyContent: 'center',
-            alignItems: 'center',
-            overflow: 'hidden',
-          },
-          button: {
-            width: '100%',
-            height: 50,
-            justifyContent: 'center',
-            alignItems: 'center',
-            borderWidth: 1,
-            borderRadius: 8,
-          },
-          textContainer: {
-            flexDirection: 'row',
-            alignItems: 'center',
-          },
-          buttonText: {
-            fontWeight: '600',
-            fontSize: 16,
-          },
-        });
-
-
+        export default AnimatedList
      ```
     
 </Steps>
@@ -246,9 +284,16 @@ import { Steps } from '@astrojs/starlight/components';
 
 | Prop      | Type     | Description                          |
 |-------------|----------|--------------------------------------|
-| `buttonColor`| `string` | Color of the button.    |
-| `buttonTextColor`| `string` | Color of button Text.      |
+| `data`| `array` | Array of objects(list items)    |
+| `ItemStyle`| `React.ElementType`  | React component which defines the style of individual item      |
 | `subscribeStatus`| `boolean`| state of the button(subscribed/unsubscribed).       |
-| `initialText`| `string` | First text of button .|
-| `changeText`| `string` | Text that will appear after state change .|
+| `animation`| `string` | Type of Animation .|
 
+## Animations
+
+1. left-slide
+2. right-slide
+3. left-slide-spring
+4. right-slide-spring
+5. bottom-up
+6. bottom-up-spring

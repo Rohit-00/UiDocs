@@ -3,7 +3,7 @@ title: Credit Card
 description: A reference page in my new Starlight docs site.
 ---
 
-A button which changes it's appearance if tapped
+visually stunning Credit Card Animated component which flips if tapped.
 
 
 
@@ -11,31 +11,32 @@ A button which changes it's appearance if tapped
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 import { Code } from '@astrojs/starlight/components';
 
-export const exampleCode = `import { StyleSheet, Text, View } from 'react-native'
+export const exampleCode = `import { StyleSheet, View } from 'react-native'
 import React from 'react'
-import { AnimatedSubscribeButton } from '../components/animatedButton'
+import CreditCard from '../components/creditCard'
 
-const App = () => {
+const CreditCardScreen = () => {
   return (
     <View>
 
-      <AnimatedSubscribeButton
-  buttonColor="#000000"
-  buttonTextColor="#ffffff"
-  subscribeStatus={false}
-  initialText="Subscribe"
-  changeText="Subscribed"
+      <CreditCard
+      bankName='SBI'
+      cardHolderName='Rohit'
+      cardNumber={'1234 5678 9123 4567'}
+      expiryDate={'12/25'}
+      cvv={699}
       />
-
+      
     </View>
-  )}
+  )
+}
 
-export default App`;
+export default CreditCardScreen`;
 export const fileName = 'App.tsx';
 export const highlights = ['file', 'CMS'];
 
 <Tabs>
-  <TabItem label="Preview"><img src="https://i.ibb.co/7YhGL6P/Animated-Button-ezgif-com-video-to-webp-converter.webp" alt="Alt text" height="400" width="200" 
+  <TabItem label="Preview"><img src="https://i.ibb.co/nRyDfw3/Credit-Card-ezgif-com-video-to-webp-converter.webp" alt="Alt text" height="400" width="200" 
   style={{ display: 'block', margin: '0 auto' }}/>
 </TabItem>
   <TabItem label="Code"><Code code={exampleCode} lang="js" title={fileName} mark={highlights} /></TabItem>
@@ -82,7 +83,7 @@ import { Steps } from '@astrojs/starlight/components';
 
           return (            
         <GestureHandlerRootView >
-          {/* Component goes here */}
+          {/* Rest of the code */}
         </GestureHandlerRootView>
 
           );
@@ -91,110 +92,164 @@ import { Steps } from '@astrojs/starlight/components';
 
   4. **Copy core component `src/components/AnimatedButton.tsx`**
      ```tsx
-        import React, { useState } from 'react';
-        import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-        import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
+        import React from 'react';
+        import { View, Text, StyleSheet, Dimensions } from 'react-native';
+        import Animated, { useSharedValue, useAnimatedStyle, withTiming, interpolate } from 'react-native-reanimated';
+        import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 
-        interface AnimatedSubscribeButtonProps {
-          buttonColor: string;
-          buttonTextColor?: string;
-          subscribeStatus: boolean;
-          initialText: React.ReactElement | string;
-          changeText: React.ReactElement | string;
-          buttonWidth?:number
+        const { width: deviceWidth } = Dimensions.get('window');
+
+        type creditCardProps = {
+        bankName ?: string,
+        cardNumber ?: string,
+        cardHolderName ?: string,
+        expiryDate ?: string,
+        cvv ?: number
+
         }
 
-        export const AnimatedSubscribeButton: React.FC<AnimatedSubscribeButtonProps> = ({
-          buttonColor,
-          subscribeStatus = false,
-          buttonTextColor = '#fff',
-          initialText,
-          changeText,
-          buttonWidth
-        }) => {
-          const [isSubscribed, setIsSubscribed] = useState<boolean>(subscribeStatus);
+        const CreditCard: React.FC <creditCardProps> = ({bankName,cardNumber,cardHolderName,expiryDate,cvv}) => {
+        const rotateY = useSharedValue(0);
 
-          // Shared value for the opacity animation
-          const opacity = useSharedValue(1);
-          const translateY = useSharedValue(0);
-
-          // Animate styles based on the subscription status
-          const animatedButtonStyle = useAnimatedStyle(() => {
+        const animatedFrontStyle = useAnimatedStyle(() => {
             return {
-              opacity: withTiming(opacity.value, { duration: 300 }),
+            transform: [
+                { perspective: 1000 },
+                {
+                rotateY: `${interpolate(
+                    rotateY.value,
+                    [0, 180],
+                    [0, 180]
+                )}deg`,
+                },
+            ],
+            backfaceVisibility: 'hidden',
+            shadowOpacity: interpolate(rotateY.value, [0, 90, 180], [0.3, 0, 0.3]),
             };
-          });
-
-          const animatedTextStyle = useAnimatedStyle(() => {
-            return {
-              transform: [{ translateY: withTiming(translateY.value, { duration: 300 }) }],
-            };
-          });
-
-          const handlePress = () => {
-            // Trigger animation and toggle subscription state
-            opacity.value = 0; // Fade out
-            translateY.value = -50; // Move text up
-
-            setTimeout(() => {
-              setIsSubscribed(!isSubscribed);
-              opacity.value = 1; // Fade in
-              translateY.value = 0; // Move text back to original position
-            }, 300);
-          };
-
-          return (
-            <Animated.View style={[styles.buttonContainer,{width:buttonWidth||200}]}>
-              <TouchableOpacity
-                onPress={handlePress}
-                style={[
-                  styles.button,
-                  { backgroundColor: isSubscribed ? '#fff' : buttonColor, borderColor: buttonColor },
-                ]}
-                activeOpacity={1}
-              >
-                <Animated.View style={[animatedButtonStyle, animatedTextStyle]}>
-                  {isSubscribed ? (
-                    <View style={styles.textContainer}>
-                      <Text style={[styles.buttonText, { color: buttonColor }]}>{changeText}</Text>
-                    </View>
-                  ) : (
-                    <View style={styles.textContainer}>
-                      <Text style={[styles.buttonText, { color: buttonTextColor }]}>{initialText}</Text>
-                    </View>
-                  )}
-                </Animated.View>
-              </TouchableOpacity>
-            </Animated.View>
-          );
-        };
-
-        // Styles for the component
-        const styles = StyleSheet.create({
-          buttonContainer: {
-            borderRadius: 8,
-            justifyContent: 'center',
-            alignItems: 'center',
-            overflow: 'hidden',
-          },
-          button: {
-            width: '100%',
-            height: 50,
-            justifyContent: 'center',
-            alignItems: 'center',
-            borderWidth: 1,
-            borderRadius: 8,
-          },
-          textContainer: {
-            flexDirection: 'row',
-            alignItems: 'center',
-          },
-          buttonText: {
-            fontWeight: '600',
-            fontSize: 16,
-          },
         });
 
+        const animatedBackStyle = useAnimatedStyle(() => {
+            return {
+            transform: [
+                { perspective: 1000 },
+                {
+                rotateY: `${interpolate(
+                    rotateY.value,
+                    [0, 180],
+                    [180, 360]
+                )}deg`,
+                },
+            ],
+            backfaceVisibility: 'hidden',
+            shadowOpacity: interpolate(rotateY.value, [0, 90, 180], [0.3, 0, 0.3]),
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            };
+        });
+
+        const flipGesture = Gesture.Tap().onEnd(() => {
+            rotateY.value = withTiming(rotateY.value === 0 ? 180 : 0, { duration: 800 });
+        });
+
+
+
+        return (
+            <View style={styles.container}>
+            <GestureDetector gesture={flipGesture}>
+                <Animated.View style={[styles.creditCard, animatedFrontStyle]}>
+                <Text style={styles.bankName}>{bankName?bankName:"BANKNAME"}</Text>
+                <Text style={styles.cardNumber}>{cardNumber?cardNumber:"1234 5678 9123 4567"}</Text>
+                <View style={styles.cardInfo}>
+                    <Text style={styles.cardHolder}>{cardHolderName?cardHolderName:"CARDHOLDER NAME"}</Text>
+                    <Text style={styles.expiryDate}>{expiryDate?expiryDate:'12/24'}</Text>
+                </View>
+                </Animated.View>
+            </GestureDetector>
+            <GestureDetector gesture={flipGesture}>
+                <Animated.View style={[styles.creditCard, animatedBackStyle]}>
+                <View style={styles.magneticStrip}></View>
+                <View style={styles.cvvContainer}>
+                    <Text style={styles.cvvLabel}>CVV</Text>
+                    <Text style={styles.cvvNumber}>{cvv?cvv:'123'}</Text>
+                </View>
+                </Animated.View>
+            </GestureDetector>
+            </View>
+        );
+        };
+
+        export default CreditCard;
+
+        const styles = StyleSheet.create({
+        container: {
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: 200,
+            width: deviceWidth - 40,
+        },
+        creditCard: {
+            width: deviceWidth - 40,
+            height: 200,
+            backgroundColor: '#1E90FF',
+            borderRadius: 10,
+            padding: 20,
+            justifyContent: 'space-between',
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.3,
+            shadowRadius: 3,
+            
+        },
+        bankName: {
+            fontSize: 16,
+            color: '#fff',
+            fontWeight: 'bold',
+        },
+        cardNumber: {
+            fontSize: 18,
+            color: '#fff',
+            marginVertical: 10,
+            letterSpacing: 2,
+        },
+        cardInfo: {
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+        },
+        cardHolder: {
+            fontSize: 12,
+            color: '#fff',
+        },
+        expiryDate: {
+            fontSize: 12,
+            color: '#fff',
+        },
+        magneticStrip: {
+            marginTop: 20,
+            height: 40,
+            backgroundColor: '#000',
+            width: '100%',
+            borderRadius: 4,
+        },
+        cvvContainer: {
+            flexDirection: 'row',
+            justifyContent: 'flex-end',
+            alignItems: 'center',
+            marginTop: 10,
+        },
+        cvvLabel: {
+            fontSize: 12,
+            color: '#fff',
+            marginRight: 5,
+        },
+        cvvNumber: {
+            fontSize: 14,
+            color: '#000',
+            backgroundColor: '#fff',
+            paddingHorizontal: 5,
+            borderRadius: 2,
+        },
+        });
 
      ```
     
@@ -207,9 +262,9 @@ import { Steps } from '@astrojs/starlight/components';
 
 | Prop      | Type     | Description                          |
 |-------------|----------|--------------------------------------|
-| `buttonColor`| `string` | Color of the button.    |
-| `buttonTextColor`| `string` | Color of button Text.      |
-| `subscribeStatus`| `boolean`| state of the button(subscribed/unsubscribed).       |
-| `initialText`| `string` | First text of button .|
-| `changeText`| `string` | Text that will appear after state change .|
+| `bankName`| `string` | Name of the bank.    |
+| `cardNumber`| `string` | Card Number, duh!.      |
+| `cardHolderName`| `string`| Card Holder's Name.       |
+| `expiryDate`| `string` | Expiry Date .|
+| `cvv`| `string` | CVV number.|
 
