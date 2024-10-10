@@ -3,39 +3,41 @@ title: Tinder Cards
 description: A reference page in my new Starlight docs site.
 ---
 
-A button which changes it's appearance if tapped
+An easy to integrate onboarding screens with smooth color interpolation. Just pass Images, Texts and colors and it's ready!!
 
 
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 import { Code } from '@astrojs/starlight/components';
 
-export const exampleCode = `import { StyleSheet, Text, View } from 'react-native'
+export const exampleCode = `import { StyleSheet } from 'react-native'
 import React from 'react'
-import { AnimatedSubscribeButton } from '../components/animatedButton'
+import TinderCards from '../src/components/tinderCards'
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
-const AnimatedButtonScreen = () => {
+const cards = [
+  { id: 1, name: 'John Doe', age: 20 , description: 'Lorem ipsum', image: 'https://images.ctfassets.net/h6goo9gw1hh6/2sNZtFAWOdP1lmQ33VwRN3/24e953b920a9cd0ff2e1d587742a2472/1-intro-photo-final.jpg?w=1200&h=992&fl=progressive&q=70&fm=jpg' },
+  { id: 2, name: 'Jane Smith', age: 24 , description: 'Lorem ipsum', image: 'https://writestylesonline.com/wp-content/uploads/2018/11/Three-Statistics-That-Will-Make-You-Rethink-Your-Professional-Profile-Picture-1024x1024.jpg' },
+  { id: 3, name: 'Dwight', age: 35 , description: 'Bears, Beats, BattleStar Galactica', image: 'https://akns-images.eonline.com/eol_images/Entire_Site/2013221/TheOfficePranks6.jpg?fit=around%7C776:576&output-quality=90&crop=776:576;center,top' },
+  { id: 4, name: 'Anurag Negi', age: 21 , description: 'Is this grindr??', image: 'https://via.placeholder.com/300' },
+]
+const App = () => {
+
   return (
-    <View>
+  <GestureHandlerRootView>
+    <TinderCards
+    profiles={cards}
+    />
+  </GestureHandlerRootView>
+  )
+}
 
-      <AnimatedSubscribeButton
-  buttonColor="#000000"
-  buttonTextColor="#ffffff"
-  subscribeStatus={false}
-  initialText="Subscribe"
-  changeText="Subscribed"
-      />
+export default App`;
 
-    </View>
-  )}
-
-export default AnimatedButtonScreen
-
-const styles = StyleSheet.create({})`;
-export const fileName = 'example.js';
+export const fileName = 'App.tsx';
 export const highlights = ['file', 'CMS'];
 
 <Tabs>
-  <TabItem label="Preview"><img src="https://i.ibb.co/mzBbB9m/Tinder-Swipe-Card-ezgif-com-video-to-webp-converter.webp" alt="Alt text" height="400" width="200"
+  <TabItem label="Preview"><img src="https://i.ibb.co/mzBbB9m/Tinder-Swipe-Card-ezgif-com-video-to-webp-converter.webp" alt="Alt text" height="400" width="200" 
   style={{ display: 'block', margin: '0 auto' }}/>
 </TabItem>
   <TabItem label="Code"><Code code={exampleCode} lang="js" title={fileName} mark={highlights} /></TabItem>
@@ -65,110 +67,241 @@ import { Steps } from '@astrojs/starlight/components';
        </TabItem>
      </Tabs>
   2. **Add Reanimated plugin into babel.config file**
-     ```js
-        import React, { useState } from 'react';
-        import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-        import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
+      ```js
+        module.exports = {
+          presets: [
+            ... // don't add it here :)
+          ],
+          plugins: [
+            ...
+            'react-native-reanimated/plugin',
+          ],
+        };
+      ```
+  3. **Install `react-native-gesture-handler`**
+     <Tabs>
+       <TabItem label="NPM">
+          ```bash
+         npm install react-native-gesture-handler
+         ```
+       </TabItem>
+       <TabItem label="YARN">
+         ```bash
+        yarn add react-native-gesture-handler
+         ```
+       </TabItem>
+       <TabItem label="EXPO">
+         ```bash
+        npx expo install react-native-gesture-handler
+         ```
+       </TabItem>
+     </Tabs>
+  
+  4. **Wrap your app inside `<GestureHandlerRootView>` (make sure it's at the root of your project)**
+      ```tsx
+      export default function App() {
 
-        interface AnimatedSubscribeButtonProps {
-          buttonColor: string;
-          buttonTextColor?: string;
-          subscribeStatus: boolean;
-          initialText: React.ReactElement | string;
-          changeText: React.ReactElement | string;
-          buttonWidth?:number
-        }
+        return (
+          
+      <GestureHandlerRootView>
 
-        export const AnimatedSubscribeButton: React.FC<AnimatedSubscribeButtonProps> = ({
-          buttonColor,
-          subscribeStatus = false,
-          buttonTextColor = '#fff',
-          initialText,
-          changeText,
-          buttonWidth
-        }) => {
-          const [isSubscribed, setIsSubscribed] = useState<boolean>(subscribeStatus);
+        {/*components go here*/}
 
-          // Shared value for the opacity animation
-          const opacity = useSharedValue(1);
-          const translateY = useSharedValue(0);
+      </GestureHandlerRootView>
 
-          // Animate styles based on the subscription status
-          const animatedButtonStyle = useAnimatedStyle(() => {
-            return {
-              opacity: withTiming(opacity.value, { duration: 300 }),
-            };
+        );
+      }
+      ```
+
+  5. **Copy core component `src/components/tinderCards.tsx`**
+     ```tsx
+      import React, { useState } from 'react';
+      import { View, Text, StyleSheet, Dimensions, ImageBackground } from 'react-native';
+      import Animated, {
+        useSharedValue,
+        useAnimatedStyle,
+        withSpring,
+        runOnJS,
+      } from 'react-native-reanimated';
+      import {
+        GestureDetector,
+        Gesture,
+      } from 'react-native-gesture-handler';
+      import LinearGradient from 'react-native-linear-gradient';
+
+      const { width, height } = Dimensions.get('window');
+      const SWIPE_THRESHOLD = width * 0.25;
+
+      interface Card {
+        id: number;
+        name: string;
+        age:number;
+        description: string;
+        image: string;
+      }
+
+      interface TinderCardProps {
+        card: Card;
+        onSwipeLeft: (card: Card) => void 
+        onSwipeRight: (card: Card) => void;
+      }
+
+      const TinderCard: React.FC<TinderCardProps> = ({ card, onSwipeLeft, onSwipeRight }) => {
+        const translateX = useSharedValue(0);
+        const translateY = useSharedValue(0);
+        const rotate = useSharedValue(0);
+
+        // Gesture for pan handling
+        const panGesture = Gesture.Pan()
+          .onUpdate((event) => {
+            translateX.value = event.translationX;
+            translateY.value = event.translationY;
+            rotate.value = translateX.value / width;
+          })
+          .onEnd(() => {
+            if (translateX.value > SWIPE_THRESHOLD) {
+              runOnJS(onSwipeRight)(card);
+              translateX.value = withSpring(width);
+            } else if (translateX.value < -SWIPE_THRESHOLD) {
+              runOnJS(onSwipeLeft)(card);
+              translateX.value = withSpring(-width);
+            } else {
+              translateX.value = withSpring(0);
+              translateY.value = withSpring(0);
+              rotate.value = withSpring(0);
+            }
           });
 
-          const animatedTextStyle = useAnimatedStyle(() => {
-            return {
-              transform: [{ translateY: withTiming(translateY.value, { duration: 300 }) }],
-            };
-          });
-
-          const handlePress = () => {
-            // Trigger animation and toggle subscription state
-            opacity.value = 0; // Fade out
-            translateY.value = -50; // Move text up
-
-            setTimeout(() => {
-              setIsSubscribed(!isSubscribed);
-              opacity.value = 1; // Fade in
-              translateY.value = 0; // Move text back to original position
-            }, 300);
+        // Styles for the animated card
+        const animatedStyle = useAnimatedStyle(() => {
+          return {
+            transform: [
+              { translateX: translateX.value },
+              { translateY: translateY.value },
+              { rotate: `${rotate.value * 15}deg` },
+            ],
           };
+        });
 
-          return (
-            <Animated.View style={[styles.buttonContainer,{width:buttonWidth||200}]}>
-              <TouchableOpacity
-                onPress={handlePress}
-                style={[
-                  styles.button,
-                  { backgroundColor: isSubscribed ? '#fff' : buttonColor, borderColor: buttonColor },
-                ]}
-                activeOpacity={1}
-              >
-                <Animated.View style={[animatedButtonStyle, animatedTextStyle]}>
-                  {isSubscribed ? (
-                    <View style={styles.textContainer}>
-                      <Text style={[styles.buttonText, { color: buttonColor }]}>{changeText}</Text>
-                    </View>
-                  ) : (
-                    <View style={styles.textContainer}>
-                      <Text style={[styles.buttonText, { color: buttonTextColor }]}>{initialText}</Text>
-                    </View>
-                  )}
-                </Animated.View>
-              </TouchableOpacity>
+        return (
+          <GestureDetector gesture={panGesture}>
+            <Animated.View style={[styles.card, animatedStyle]}>
+              <ImageBackground source={{ uri: card.image }} style={styles.image} >
+              
+              <View style={styles.cardContent}>
+
+              <LinearGradient
+              colors={['transparent', 'rgba(0,0,0,0.7)']}
+              style={styles.gradientOverlay}
+              /><View style={{flexDirection:'column'}}>
+                <Text style={styles.name}>{card.name}, {card.age}</Text>
+                <Text style={styles.description}>{card.description}</Text>
+                </View>
+                <Text style={styles.description}> info </Text>
+              </View>
+            
+              </ImageBackground>
             </Animated.View>
-          );
+          </GestureDetector>
+        );
+      };
+      type profile = {
+        id:number,
+        name:string,
+        age:number,
+        description:string,
+        image:string
+      }
+
+      interface TinderCardsProps {
+        profiles : profile[],
+        
+      }
+
+      const TinderCards: React.FC <TinderCardsProps> = ({profiles}) => {
+        const [cards, setCards] = useState<Card[]>(profiles);
+
+        const handleSwipeLeft = (card: Card) => {
+          console.log('Swiped Left:', card.name);
+          
+          setCards((prevCards) => prevCards.filter((c) => c.id !== card.id));
         };
 
-        // Styles for the component
-        const styles = StyleSheet.create({
-          buttonContainer: {
-            borderRadius: 8,
-            justifyContent: 'center',
-            alignItems: 'center',
-            overflow: 'hidden',
-          },
-          button: {
-            width: '100%',
-            height: 50,
-            justifyContent: 'center',
-            alignItems: 'center',
-            borderWidth: 1,
-            borderRadius: 8,
-          },
-          textContainer: {
-            flexDirection: 'row',
-            alignItems: 'center',
-          },
-          buttonText: {
-            fontWeight: '600',
-            fontSize: 16,
-          },
-        });
+        const handleSwipeRight = (card: Card) => {
+          console.log('Swiped Right:', card.name);
+          setCards((prevCards) => prevCards.filter((c) => c.id !== card.id));
+        };
+
+        return (
+          <View style={styles.container}>
+            {cards
+              .map((card, index) => (
+                <TinderCard
+                  key={card.id}
+                  card={card}
+                  onSwipeLeft={handleSwipeLeft}
+                  onSwipeRight={handleSwipeRight}
+                />
+              ))
+              .reverse()}
+          </View>
+        );
+      };
+
+      export default TinderCards;
+
+      const styles = StyleSheet.create({
+        container: {
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+        },
+        card: {
+          width: width * 0.9,
+          height: height * 0.65,
+          borderRadius: 10,
+          backgroundColor: 'white',
+          position: 'absolute',
+          justifyContent: 'flex-start',
+          
+          overflow: 'hidden',
+          elevation: 1,
+        },
+        image: {
+          width: '100%',
+          height: '100%',
+          borderTopLeftRadius: 10,
+          borderTopRightRadius: 10,
+          
+        },
+        cardContent: {
+          padding: 20,
+          flex:1,
+          flexDirection:'row',
+          justifyContent:'space-between',
+          alignItems:'flex-end',
+        
+        
+        },
+        name: {
+          fontSize: 24,
+          fontWeight: 'bold',
+          color:'white'
+          
+        },
+        description: {
+          fontSize: 16,
+          color: 'white',
+
+        },
+        gradientOverlay: {
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          bottom: 0,
+          height: '30%', // Adjust the height as needed
+        },
+      });
 
 
      ```
@@ -182,9 +315,7 @@ import { Steps } from '@astrojs/starlight/components';
 
 | Prop      | Type     | Description                          |
 |-------------|----------|--------------------------------------|
-| `buttonColor`| `string` | Color of the button.    |
-| `buttonTextColor`| `string` | Color of button Text.      |
-| `subscribeStatus`| `boolean`| state of the button(subscribed/unsubscribed).       |
-| `initialText`| `string` | First text of button .|
-| `changeText`| `string` | Text that will appear after state change .|
+| `profiles`| `profile[]` | Array of objects where each objects have 5 properties(`id`, `name`, `age`, `description`, `image`).    |
 
+## Important
+To handle what happens if user swipe left or right, you have to do that inside the component (handleSwipeLeft and handleSwipeRight)

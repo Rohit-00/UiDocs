@@ -200,7 +200,9 @@ import { Steps } from '@astrojs/starlight/components';
         return (
             <View >
 
-                <Animated.ScrollView ref={scrollViewRef} horizontal onScroll={scrollHandler} scrollEventThrottle={16}  pagingEnabled  contentOffset={{ x: scrollPosition.value, y: 0 }} showsHorizontalScrollIndicator={false} onMomentumScrollEnd={handleScrollEnd} alwaysBounceHorizontal={false}
+                <Animated.ScrollView ref={scrollViewRef} horizontal onScroll={scrollHandler} 
+                scrollEventThrottle={16}  pagingEnabled  contentOffset={{ x: scrollPosition.value, y: 0 }} 
+                showsHorizontalScrollIndicator={false} onMomentumScrollEnd={handleScrollEnd} alwaysBounceHorizontal={false}
                 >
                 {Pages.map((item,index)=>
                 {
