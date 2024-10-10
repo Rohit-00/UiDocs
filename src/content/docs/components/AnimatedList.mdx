@@ -115,20 +115,8 @@ import { Steps } from '@astrojs/starlight/components';
           ],
         };
       ```
-  3. **Wrap your app in `<GestureHandlerRootView>`**
-      ```tsx
-        export default function App() {
 
-          return (            
-        <GestureHandlerRootView >
-          {/* Rest of the code */}
-        </GestureHandlerRootView>
-
-          );
-        }
-      ```
-
-  4. **Copy core component `src/components/AnimatedList.tsx`**
+  3. **Copy core component `src/components/AnimatedList.tsx`**
      ```tsx
         import { View,FlatList, ViewToken, Dimensions } from 'react-native'
         import Animated, {useAnimatedStyle, useSharedValue, withTiming , SharedValue, withSpring} from 'react-native-reanimated'
@@ -286,7 +274,6 @@ import { Steps } from '@astrojs/starlight/components';
 |-------------|----------|--------------------------------------|
 | `data`| `array` | Array of objects(list items)    |
 | `ItemStyle`| `React.ElementType`  | React component which defines the style of individual item      |
-| `subscribeStatus`| `boolean`| state of the button(subscribed/unsubscribed).       |
 | `animation`| `string` | Type of Animation .|
 
 ## Animations

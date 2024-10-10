@@ -35,7 +35,7 @@ export const fileName = 'App.tsx';
 export const highlights = ['file', 'CMS'];
 
 <Tabs>
-  <TabItem label="Preview"><img src="https://i.ibb.co/7YhGL6P/Animated-Button-ezgif-com-video-to-webp-converter.webp" alt="Alt text" height="400" width="200" 
+  <TabItem label="Preview"><img src="https://i.ibb.co/gdRH7wT/Animated-Buttongif.webp" alt="Alt text" height="400" width="200" 
   style={{ display: 'block', margin: '0 auto' }}/>
 </TabItem>
   <TabItem label="Code"><Code code={exampleCode} lang="js" title={fileName} mark={highlights} /></TabItem>
@@ -76,20 +76,9 @@ import { Steps } from '@astrojs/starlight/components';
           ],
         };
       ```
-  3. **Wrap your app in `<GestureHandlerRootView>`**
-      ```tsx
-        export default function App() {
 
-          return (            
-        <GestureHandlerRootView >
-          {/* Rest of the code */}
-        </GestureHandlerRootView>
 
-          );
-        }
-      ```
-
-  4. **Copy core component `src/components/AnimatedButton.tsx`**
+  3. **Copy core component `src/components/AnimatedButton.tsx`**
      ```tsx
         import React, { useState } from 'react';
         import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
