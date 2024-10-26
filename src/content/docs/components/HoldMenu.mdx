@@ -1,0 +1,276 @@
+---
+title: Hold To Open Menu
+description: A reference page in my new Starlight docs site.
+---
+
+A button which changes it's appearance if tapped
+
+
+
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Code } from '@astrojs/starlight/components';
+
+export const exampleCode = `import { Text, SafeAreaView, StyleSheet, View, TouchableOpacity,Alert } from 'react-native';
+import HoldMenu from '../components/holdMenu';
+  const menuItems = [
+    {
+      id: '1',
+      label: 'Edit',
+      onPress: () => Alert.alert('Edit pressed'),
+    },
+    {
+      id: '2',
+      label: 'Delete',
+      onPress: () => Alert.alert('Delete pressed'),
+    },
+    {
+      id: '3',
+      label: 'Share',
+      onPress: () => Alert.alert('Share pressed'),
+    },
+  ];
+
+const App = () => {
+  return (
+    <View style={styles.container}>
+
+      <HoldMenu items={menuItems}>
+        <View style={{ padding: 20, borderRadius: 8 ,backgroundColor:'#f2f2f2'}}>
+          <Text>Hold me to open menu</Text>
+        </View>
+      </HoldMenu>
+
+    </View>
+  );
+}
+
+export default App`;
+export const fileName = 'App.tsx';
+export const highlights = ['file', 'CMS'];
+
+<Tabs>
+  <TabItem label="Preview"><video src="https://cloud.appwrite.io/v1/storage/buckets/670bf3d800356f2d1307/files/671c3fee000c04f75efe/view?project=66cc3f88001fcc4896d5&project=66cc3f88001fcc4896d5&mode=admin" loop autoPlay muted  alt="Alt text" height="400" width="200" 
+  style={{ display: 'block', margin: '0 auto' }}/>
+</TabItem>
+  <TabItem label="Code"><Code code={exampleCode} lang="js" title={fileName} mark={highlights} /></TabItem>
+</Tabs>
+
+## Installation
+
+import { Steps } from '@astrojs/starlight/components';
+
+<Steps>
+
+  1. **Copy core component `src/components/animatedTabs.tsx`**
+     ```tsx
+        import React, { useState, useRef } from 'react';
+        import {
+        View,
+        Modal,
+        StyleSheet,
+        Pressable,
+        Animated,
+        TouchableWithoutFeedback,
+        Text,
+        ViewStyle,
+        TextStyle,
+        PressableProps,
+        
+        } from 'react-native';
+
+        interface MenuItem {
+        id: string | number;
+        label: string;
+        onPress?: () => void;
+        }
+
+        interface HoldMenuProps {
+        children: React.ReactNode;
+        items: MenuItem[];
+        holdDuration?: number;
+        menuStyle?: ViewStyle;
+        menuItemStyle?: ViewStyle;
+        menuItemTextStyle?: TextStyle;
+        overlayColor?: string;
+        triggerStyle?: ViewStyle;
+        onOpen?: () => void;
+        onClose?: () => void;
+        }
+
+        interface MenuItemComponentProps extends PressableProps {
+        item: MenuItem;
+        textStyle?: any;
+        style?: any;
+        onItemPress: (item: MenuItem) => void;
+        }
+
+        const MenuItemComponent: React.FC<MenuItemComponentProps> = ({
+        item,
+        textStyle,
+        style,
+        onItemPress,
+        ...pressableProps
+        }) => (
+        <Pressable
+            style={style}
+            onPress={() => onItemPress(item)}
+            {...pressableProps}
+        >
+            <Text style={textStyle}>{item.label}</Text>
+        </Pressable>
+        );
+
+        const HoldMenu: React.FC<HoldMenuProps> = ({
+        children,
+        items,
+        holdDuration = 500,
+        menuStyle,
+        menuItemStyle,
+        menuItemTextStyle,
+        overlayColor = 'rgba(0, 0, 0, 0.5)',
+        triggerStyle,
+        onOpen,
+        onClose,
+        }) => {
+        const [menuVisible, setMenuVisible] = useState<boolean>(false);
+        const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+        const scaleAnim = useRef(new Animated.Value(0)).current;
+
+        const handlePressIn = () => {
+            timeoutRef.current = setTimeout(() => {
+            setMenuVisible(true);
+            onOpen?.();
+            Animated.spring(scaleAnim, {
+                toValue: 1,
+                useNativeDriver: true,
+                tension: 65,
+                friction: 7,
+            }).start();
+            }, holdDuration);
+        };
+
+        const handlePressOut = () => {
+            if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+            }
+        };
+
+        const closeMenu = () => {
+            Animated.timing(scaleAnim, {
+            toValue: 0,
+            duration: 200,
+            useNativeDriver: true,
+            }).start(() => {
+            setMenuVisible(false);
+            onClose?.();
+            });
+        };
+
+        const handleMenuItemPress = (item: MenuItem) => {
+            item.onPress?.();
+            closeMenu();
+        };
+
+        return (
+            <View>
+            <Pressable
+                onPressIn={handlePressIn}
+                onPressOut={handlePressOut}
+                style={[styles.trigger, triggerStyle]}
+            >
+                {children}
+            </Pressable>
+
+            <Modal
+                visible={menuVisible}
+                transparent
+                animationType="none"
+                onRequestClose={closeMenu}
+            >
+                <TouchableWithoutFeedback onPress={closeMenu}>
+                <View style={[styles.modalOverlay, { backgroundColor: overlayColor }]}>
+                    <TouchableWithoutFeedback>
+                    <Animated.View
+                        style={[
+                        styles.menuContainer,
+                        menuStyle,
+                        {
+                            transform: [{ scale: scaleAnim }],
+                        },
+                        ]}
+                    >
+                        {items.map((item) => (
+                        <MenuItemComponent
+                            key={item.id}
+                            item={item}
+                            style={[styles.menuItem, menuItemStyle]}
+                            textStyle={[styles.menuItemText, menuItemTextStyle]}
+                            onItemPress={handleMenuItemPress}
+                        />
+                        ))}
+                    </Animated.View>
+                    </TouchableWithoutFeedback>
+                </View>
+                </TouchableWithoutFeedback>
+            </Modal>
+            </View>
+        );
+        };
+
+        const styles = StyleSheet.create({
+        trigger: {
+            // Base trigger styles
+        },
+        modalOverlay: {
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+        },
+        menuContainer: {
+            backgroundColor: 'white',
+            borderRadius: 8,
+            padding: 8,
+            minWidth: 200,
+            shadowColor: '#000',
+            shadowOffset: {
+            width: 0,
+            height: 2,
+            },
+            shadowOpacity: 0.25,
+            shadowRadius: 3.84,
+            elevation: 5,
+        },
+        menuItem: {
+            padding: 12,
+            borderBottomWidth: 1,
+            borderBottomColor: '#eee',
+        },
+        menuItemText: {
+            fontSize: 16,
+            color: '#333',
+        },
+        });
+
+        export default HoldMenu;
+
+
+     ```
+    
+</Steps>
+
+ 
+
+
+## Props
+
+| Prop      | Type     | Description                          |
+|-------------|----------|--------------------------------------|
+| `items`| `menuItem[]` | Array of objects containing 3 properties: id(string), label(string) and onPress(callback function).    |
+| `holdDuration`| `number` | how much longer user should hold to open the menu.    |
+| `menuStyle`| `Viewstyle` | Style of the menu container.    |
+| `menuItemStyle`| `Viewstyle` | Style of the menu Item.    |
+| `menuItemTextStyle`| `Viewstyle` | Style of the menu Text.    |
+| `overlayColor`| `string` | color of the menu overlay.    |
+| `onOpen`| `callback` | function to be called when menu opens    |
+| `onClose`| `callback` | function to be called when menu closes    |

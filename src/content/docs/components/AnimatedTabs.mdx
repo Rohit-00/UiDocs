@@ -1,0 +1,227 @@
+---
+title: Animated Tabs
+description: A reference page in my new Starlight docs site.
+---
+
+A button which changes it's appearance if tapped
+
+
+
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Code } from '@astrojs/starlight/components';
+
+export const exampleCode = `import { StyleSheet, Text, View } from 'react-native'
+import React from 'react'
+import TabBar from '../components/animatedTabs'
+
+const tabs = ["home","profile","settings"]
+const App = () => {
+  return (
+    <View>
+     <TabBar tabs={tabs}/> {/* Change the tab content from the core component itself */}
+    </View>
+  )
+}
+
+export default App`;
+export const fileName = 'App.tsx';
+export const highlights = ['file', 'CMS'];
+
+<Tabs>
+  <TabItem label="Preview"><video src="https://cloud.appwrite.io/v1/storage/buckets/670bf3d800356f2d1307/files/671c3fe8003700d7248e/view?project=66cc3f88001fcc4896d5&project=66cc3f88001fcc4896d5&mode=admin" loop autoPlay muted  alt="Alt text" height="400" width="200" 
+  style={{ display: 'block', margin: '0 auto' }}/>
+</TabItem>
+  <TabItem label="Code"><Code code={exampleCode} lang="js" title={fileName} mark={highlights} /></TabItem>
+</Tabs>
+
+## Installation
+
+import { Steps } from '@astrojs/starlight/components';
+
+<Steps>
+  1. **Install React Native Reanimated**
+     <Tabs>
+       <TabItem label="NPM">
+          ```bash
+         npm install react-native-reanimated
+         ```
+       </TabItem>
+       <TabItem label="YARN">
+         ```bash
+        yarn add react-native-reanimated
+         ```
+       </TabItem>
+       <TabItem label="EXPO">
+         ```bash
+        npx expo install react-native-reanimated
+         ```
+       </TabItem>
+     </Tabs>
+  2. **Add Reanimated plugin into babel.config file**
+      ```js
+        module.exports = {
+          presets: [
+            ... // don't add it here :)
+          ],
+          plugins: [
+            ...
+            'react-native-reanimated/plugin',
+          ],
+        };
+      ```
+
+
+  3. **Copy core component `src/components/animatedTabs.tsx`**
+     ```tsx
+        import React, { useState } from 'react';
+        import { View, Text, TouchableOpacity, StyleSheet, Appearance } from 'react-native';
+        import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+
+        const theme = {
+        dark:{
+            text: 'white',
+            background:'#191e24',
+            primary: '#007AFF',
+        },
+        light:{
+            text: 'black',
+            background: '#f2f2f2',
+            primary: '#007AFF',
+        }
+        }
+
+        const TAB_WIDTH = 100
+
+        const isDarkMode = Appearance.getColorScheme() === 'dark'
+        const colors = theme[isDarkMode?'dark':'light']
+
+        type tabProps = {
+        tabs : string[]
+        }
+
+        const TabBar : React.FC<tabProps> = ({tabs}) => {
+        const [activeTab, setActiveTab] = useState(0);
+        const activeIndex = useSharedValue(0);
+
+        const onTabPress = (index:number) => {
+            setActiveTab(index);
+            activeIndex.value = withTiming(index, { duration: 300 }); // Smooth transition to the selected tab
+        };
+
+        // Animate the background of the active tab
+        const animatedStyle = useAnimatedStyle(() => {
+            return {
+            transform: [{ translateX: activeIndex.value * TAB_WIDTH }],  // Assuming each tab has 100px width
+            };
+        });
+
+        // Render the content for each tab
+        const renderContent = () => {
+            switch(activeTab) {
+            case 0:
+                return <Text style={styles.contentText}>Welcome to the Home Tab</Text>; //add component or whatever you want
+            case 1:
+                return <Text style={styles.contentText}>This is the Profile Tab</Text>;
+            case 2:
+                return <Text style={styles.contentText}>Settings Page</Text>;
+            //add more according to your tabs
+            default:
+                return null;
+            }
+        }
+
+        return (
+            <View style={styles.wrapper}>
+            {/* Tab Bar */}
+            <View style={styles.container}>
+                {/* Highlight background */}
+                <Animated.View style={[styles.highlight, animatedStyle]} />
+                {/* Render tabs */}
+                <View style={[styles.tabsContainer,{width: TAB_WIDTH*tabs.length}]}>
+                {tabs.map((tab, index) => (
+                    <TouchableOpacity key={index} onPress={() => onTabPress(index)} style={styles.tab}>
+                    <Text style={activeTab === index ? styles.activeTabText : styles.tabText}>{tab}</Text>
+                    </TouchableOpacity>
+                ))}
+                </View>
+            </View>
+
+            {/* Render content below the tabs */}
+            <View style={styles.content}>
+                {renderContent()}
+            </View>
+            </View>
+        );
+        };
+
+        const styles = StyleSheet.create({
+        wrapper: {
+            flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+        
+        },
+        container: {
+            position: 'relative',
+            height: 50,
+            flexDirection: 'row',
+            backgroundColor: colors.background,
+            alignItems:'center',
+            borderRadius: 10,
+        },
+        tabsContainer: {
+            flexDirection: 'row',
+            // Fixed width for simplicity (100px per tab)
+        },
+        tab: {
+            width: TAB_WIDTH,
+            alignItems: 'center',
+            justifyContent: 'center',
+        },
+        tabText: {
+            color: colors.text,
+            fontSize: 16,
+        },
+        activeTabText: {
+            color: '#fff',
+            fontWeight: 'bold',
+            fontSize: 16,
+        },
+        highlight: {
+            position: 'absolute',
+            width: 90,
+            height: '80%',
+            backgroundColor: colors.primary,
+            borderRadius: 10,
+            right:5,
+            left:5
+        
+        },
+        content: {
+            marginTop: 20,
+        },
+        
+        contentText: {
+            fontSize: 18,
+            color: 'colors.text',
+        },
+        });
+
+        export default TabBar;
+
+
+     ```
+    
+</Steps>
+
+ 
+
+
+## Props
+
+| Prop      | Type     | Description                          |
+|-------------|----------|--------------------------------------|
+| `tabs`| `string[]` | Array of string containing name of the tabs.    |
+
+**Note:To add the content in the tabs you have to do it manually in core component code**

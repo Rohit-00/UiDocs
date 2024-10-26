@@ -1,0 +1,283 @@
+---
+title: Circular Progress
+description: A reference page in my new Starlight docs site.
+---
+
+A button which changes it's appearance if tapped
+
+
+
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Code } from '@astrojs/starlight/components';
+
+export const exampleCode = `import { StyleSheet, View } from 'react-native'
+import React from 'react'
+import CircularProgress from '../components/circularProgress'
+
+const App = () => {
+  return (
+    <View>
+      <CircularProgress progress={50} />{/* see props for more customization */}
+    </View>
+  )
+}
+
+export default App
+`;
+export const fileName = 'App.tsx';
+export const highlights = ['file', 'CMS'];
+
+<Tabs>
+  <TabItem label="Preview"><video src="https://cloud.appwrite.io/v1/storage/buckets/670bf3d800356f2d1307/files/671c400700018980ac2c/view?project=66cc3f88001fcc4896d5&project=66cc3f88001fcc4896d5&mode=admin" loop autoPlay muted  alt="Alt text" height="400" width="200" 
+  style={{ display: 'block', margin: '0 auto' }}/>
+</TabItem>
+  <TabItem label="Code"><Code code={exampleCode} lang="js" title={fileName} mark={highlights} /></TabItem>
+</Tabs>
+
+## Installation
+
+import { Steps } from '@astrojs/starlight/components';
+
+<Steps>
+  1. **Install `react-native-svg`**
+     <Tabs>
+       <TabItem label="NPM">
+          ```bash
+         npm install react-native-svg
+         ```
+       </TabItem>
+       <TabItem label="YARN">
+         ```bash
+        yarn add react-native-svg
+         ```
+       </TabItem>
+       <TabItem label="EXPO">
+         ```bash
+        npx expo install react-native-svg
+         ```
+       </TabItem>
+     </Tabs>
+
+
+  3. **Copy core component `src/components/circularProgress.tsx`**
+     ```tsx
+        import React, { useEffect, useRef } from 'react';
+        import { View, Animated, StyleSheet, Easing } from 'react-native';
+        import Svg, { Circle, G } from 'react-native-svg';
+
+        const AnimatedCircle = Animated.createAnimatedComponent(Circle);
+
+        const CircularProgress = ({
+        size = 100,
+        strokeWidth = 10,
+        progress = 0,
+        progressColor = '#2196F3',
+        backgroundColor = '#E0E0E0',
+        duration = 1000, // Animation duration in ms
+        }) => {
+        // Calculate dimensions
+        const center = size / 2;
+        const radius = (size - strokeWidth) / 2;
+        const circumference = 2 * Math.PI * radius;
+        
+        // Animation value
+        const progressAnimation = useRef(new Animated.Value(0)).current;
+        
+        // Animate when progress changes
+        useEffect(() => {
+            Animated.timing(progressAnimation, {
+            toValue: progress,
+            duration: duration,
+            easing: Easing.out(Easing.ease),
+            useNativeDriver: true,
+            }).start();
+        }, [progress, duration]);
+
+        // Calculate the animated stroke dash offset
+        const strokeDashoffset = progressAnimation.interpolate({
+            inputRange: [0, 100],
+            outputRange: [circumference, 0],
+        });
+
+        return (
+            <View style={[styles.container, { width: size, height: size }]}>
+            <Svg width={size} height={size}>
+                <G rotation="-90" origin={`${center}, ${center}`}>
+                {/* Background Circle */}
+                <Circle
+                    cx={center}
+                    cy={center}
+                    r={radius}
+                    stroke={backgroundColor}
+                    strokeWidth={strokeWidth}
+                    fill="none"
+                />
+                {/* Animated Progress Circle */}
+                <AnimatedCircle
+                    cx={center}
+                    cy={center}
+                    r={radius}
+                    stroke={progressColor}
+                    strokeWidth={strokeWidth}
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeDasharray={circumference}
+                    strokeDashoffset={strokeDashoffset}
+                />
+                </G>
+            </Svg>
+            </View>
+        );
+        };
+
+        const styles = StyleSheet.create({
+        container: {
+            alignItems: 'center',
+            justifyContent: 'center',
+        },
+        });
+
+        export default CircularProgress;
+
+
+     ```
+    
+</Steps>
+
+ 
+
+
+## Props
+
+| Prop      | Type     | Description                          |
+|-------------|----------|--------------------------------------|
+| `size`| `number` | Size of the component.    |
+| `strokeWidth`| `number` | Strok width of the circle.      |
+| `progress`| `number`| Progess state (0-100).       |
+| `progressColor`| `string` | Color of the progress.|
+| `backgroundColor`| `string` | Color of the background.|
+| `duration`| `number` | Animation duration to complete(ms).|
+
+
+## Circular Progress with numbers
+
+export const example = `import { StyleSheet, View } from 'react-native'
+import React from 'react'
+import CircularProgress from '../components/circularProgressNum'
+
+const App = () => {
+  return (
+    <View>
+      <CircularProgressNum progress={50} />{/* see props for more customization */}
+    </View>
+  )
+}
+
+export default App
+`;
+export const file = 'App.tsx';
+export const highlight = ['file', 'CMS'];
+
+<Tabs>
+  <TabItem label="Preview"><video src="https://cloud.appwrite.io/v1/storage/buckets/670bf3d800356f2d1307/files/671c3ff8002d2bfce862/view?project=66cc3f88001fcc4896d5&project=66cc3f88001fcc4896d5&mode=admin" loop autoPlay muted  alt="Alt text" height="400" width="200" 
+  style={{ display: 'block', margin: '0 auto' }}/>
+</TabItem>
+  <TabItem label="Code"><Code code={example} lang="js" title={file} mark={highlight} /></TabItem>
+</Tabs>
+
+**Copy core component `src/components/circularProgressNum.tsx`**
+     ```tsx
+        import React, { useEffect, useRef } from 'react';
+        import { View, Animated, StyleSheet, Easing } from 'react-native';
+        import Svg, { Circle, G } from 'react-native-svg';
+
+        const AnimatedCircle = Animated.createAnimatedComponent(Circle);
+
+        const CircularProgressNum = ({
+        size = 100,
+        strokeWidth = 10,
+        progress = 0,
+        progressColor = '#2196F3',
+        backgroundColor = '#E0E0E0',
+        duration = 1000, // Animation duration in ms
+        }) => {
+        // Calculate dimensions
+        const center = size / 2;
+        const radius = (size - strokeWidth) / 2;
+        const circumference = 2 * Math.PI * radius;
+        
+        // Animation value
+        const progressAnimation = useRef(new Animated.Value(0)).current;
+        
+        // Animate when progress changes
+        useEffect(() => {
+            Animated.timing(progressAnimation, {
+            toValue: progress,
+            duration: duration,
+            easing: Easing.out(Easing.ease),
+            useNativeDriver: true,
+            }).start();
+        }, [progress, duration]);
+
+        // Calculate the animated stroke dash offset
+        const strokeDashoffset = progressAnimation.interpolate({
+            inputRange: [0, 100],
+            outputRange: [circumference, 0],
+        });
+
+        return (
+            <View style={[styles.container, { width: size, height: size }]}>
+            <Svg width={size} height={size}>
+                <G rotation="-90" origin={`${center}, ${center}`}>
+                {/* Background Circle */}
+                <Circle
+                    cx={center}
+                    cy={center}
+                    r={radius}
+                    stroke={backgroundColor}
+                    strokeWidth={strokeWidth}
+                    fill="none"
+                />
+                {/* Animated Progress Circle */}
+                <AnimatedCircle
+                    cx={center}
+                    cy={center}
+                    r={radius}
+                    stroke={progressColor}
+                    strokeWidth={strokeWidth}
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeDasharray={circumference}
+                    strokeDashoffset={strokeDashoffset}
+                />
+                </G>
+            </Svg>
+            </View>
+        );
+        };
+
+        const styles = StyleSheet.create({
+        container: {
+            alignItems: 'center',
+            justifyContent: 'center',
+        },
+        });
+
+        export default CircularProgressNum;
+
+
+     ```
+## Props
+
+| Prop      | Type     | Description                          |
+|-------------|----------|--------------------------------------|
+| `size`| `number` | Size of the component.    |
+| `strokeWidth`| `number` | Strok width of the circle.      |
+| `progress`| `number`| Progess state (0-100).       |
+| `progressColor`| `string` | Color of the progress.|
+| `backgroundColor`| `string` | Color of the background.|
+| `duration`| `number` | Animation duration to complete(ms).|
+| `TextColor`| `string` | Color of the Text.|
+| `TextSize`| `number` | Size of the Text.|
+| `showPercentage`| `boolean` | Show % at the end of the number.|
