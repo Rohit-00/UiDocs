@@ -10,34 +10,68 @@ A button which changes it's appearance if tapped
 
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 import { Code } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
 
 export const exampleCode = `import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
-import TabBar from '../components/animatedTabs'
+import AnimatedTabs from '../components/animatedTabs'
+
+//or if you're using npm package
+//import {AnimatedTabs} from '@cascadeui/animated-tabs'
 
 const tabs = ["home","profile","settings"]
+
+const HomeContent = () => <Text style={styles.contentText}>Welcome to the Home Tab</Text>; //replace with real screens or content
+const ProfileContent = () => <Text style={styles.contentText}>This is the Profile Tab</Text>;
+const SettingsContent = () => <Text style={styles.contentText}>Settings Page</Text>;
+
 const App = () => {
   return (
     <View>
-     <TabBar tabs={tabs}/> {/* Change the tab content from the core component itself */}
+    <TabBar  tabs={['Home', 'Profile', 'Settings']} 
+     contents={[<HomeContent />, <ProfileContent />, <SettingsContent />]} />
     </View>
   )
 }
 
 export default App`;
 export const fileName = 'App.tsx';
-export const highlights = ['file', 'CMS'];
 
 <Tabs>
   <TabItem label="Preview"><video src="https://cloud.appwrite.io/v1/storage/buckets/670bf3d800356f2d1307/files/671c3fe8003700d7248e/view?project=66cc3f88001fcc4896d5&project=66cc3f88001fcc4896d5&mode=admin" loop autoPlay muted  alt="Alt text" height="400" width="200" 
   style={{ display: 'block', margin: '0 auto' }}/>
 </TabItem>
-  <TabItem label="Code"><Code code={exampleCode} lang="js" title={fileName} mark={highlights} /></TabItem>
+  <TabItem label="Code"><Code code={exampleCode} lang="js" title={fileName} /></TabItem>
 </Tabs>
 
 ## Installation
 
-import { Steps } from '@astrojs/starlight/components';
+<Tabs>
+
+<TabItem label='cli'>
+
+<Steps>
+1. **Install component**
+     ```bash
+    npm install @cascadeui/animated-tabs
+    ```
+2. **Add react-native-reanimated plugin into `babel.config`**
+      ```js
+        module.exports = {
+          presets: [
+            ... // don't add it here :)
+          ],
+          plugins: [
+            ...
+            'react-native-reanimated/plugin',
+          ],
+        };
+      ```
+</Steps>
+
+</TabItem>
+
+<TabItem label='manual'>
 
 <Steps>
   1. **Install React Native Reanimated**
@@ -74,146 +108,127 @@ import { Steps } from '@astrojs/starlight/components';
 
   3. **Copy core component `src/components/animatedTabs.tsx`**
      ```tsx
-        import React, { useState } from 'react';
-        import { View, Text, TouchableOpacity, StyleSheet, Appearance } from 'react-native';
-        import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+      import React, { useState } from 'react';
+      import { View, Text, TouchableOpacity, StyleSheet, Appearance } from 'react-native';
+      import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 
-        const theme = {
-        dark:{
-            text: 'white',
-            background:'#191e24',
-            primary: '#007AFF',
+      const theme = {
+        dark: {
+          text: 'white',
+          background: '#191e24',
+          primary: '#007AFF',
         },
-        light:{
-            text: 'black',
-            background: '#f2f2f2',
-            primary: '#007AFF',
+        light: {
+          text: 'black',
+          background: '#f2f2f2',
+          primary: '#007AFF',
         }
-        }
+      };
 
-        const TAB_WIDTH = 100
+      const TAB_WIDTH = 100;
 
-        const isDarkMode = Appearance.getColorScheme() === 'dark'
-        const colors = theme[isDarkMode?'dark':'light']
+      const isDarkMode = Appearance.getColorScheme() === 'dark';
+      const colors = theme[isDarkMode ? 'dark' : 'light'];
 
-        type tabProps = {
-        tabs : string[]
-        }
+      type TabProps = {
+        tabs: string[],
+        contents: React.ReactNode[],
+      };
 
-        const TabBar : React.FC<tabProps> = ({tabs}) => {
+      const AnimatedTabs: React.FC<TabProps> = ({ tabs, contents }) => {
         const [activeTab, setActiveTab] = useState(0);
         const activeIndex = useSharedValue(0);
 
-        const onTabPress = (index:number) => {
-            setActiveTab(index);
-            activeIndex.value = withTiming(index, { duration: 300 }); // Smooth transition to the selected tab
+        const onTabPress = (index: number) => {
+          setActiveTab(index);
+          activeIndex.value = withTiming(index, { duration: 300 });
         };
 
-        // Animate the background of the active tab
         const animatedStyle = useAnimatedStyle(() => {
-            return {
-            transform: [{ translateX: activeIndex.value * TAB_WIDTH }],  // Assuming each tab has 100px width
-            };
+          return {
+            transform: [{ translateX: activeIndex.value * TAB_WIDTH }],
+          };
         });
-
-        // Render the content for each tab
-        const renderContent = () => {
-            switch(activeTab) {
-            case 0:
-                return <Text style={styles.contentText}>Welcome to the Home Tab</Text>; //add component or whatever you want
-            case 1:
-                return <Text style={styles.contentText}>This is the Profile Tab</Text>;
-            case 2:
-                return <Text style={styles.contentText}>Settings Page</Text>;
-            //add more according to your tabs
-            default:
-                return null;
-            }
-        }
 
         return (
-            <View style={styles.wrapper}>
-            {/* Tab Bar */}
+          <View style={styles.wrapper}>
             <View style={styles.container}>
-                {/* Highlight background */}
-                <Animated.View style={[styles.highlight, animatedStyle]} />
-                {/* Render tabs */}
-                <View style={[styles.tabsContainer,{width: TAB_WIDTH*tabs.length}]}>
+              <Animated.View style={[styles.highlight, animatedStyle]} />
+              <View style={[styles.tabsContainer, { width: TAB_WIDTH * tabs.length }]}>
                 {tabs.map((tab, index) => (
-                    <TouchableOpacity key={index} onPress={() => onTabPress(index)} style={styles.tab}>
+                  <TouchableOpacity key={index} onPress={() => onTabPress(index)} style={styles.tab}>
                     <Text style={activeTab === index ? styles.activeTabText : styles.tabText}>{tab}</Text>
-                    </TouchableOpacity>
+                  </TouchableOpacity>
                 ))}
-                </View>
+              </View>
             </View>
-
-            {/* Render content below the tabs */}
             <View style={styles.content}>
-                {renderContent()}
+              {contents[activeTab]}
             </View>
-            </View>
+          </View>
         );
-        };
+      };
 
-        const styles = StyleSheet.create({
+      const styles = StyleSheet.create({
         wrapper: {
-            flex: 1,
-            alignItems: 'center',
-            justifyContent: 'center',
-        
+          flex: 1,
+          alignItems: 'center',
+          justifyContent: 'center',
         },
         container: {
-            position: 'relative',
-            height: 50,
-            flexDirection: 'row',
-            backgroundColor: colors.background,
-            alignItems:'center',
-            borderRadius: 10,
+          position: 'relative',
+          height: 50,
+          flexDirection: 'row',
+          backgroundColor: colors.background,
+          alignItems: 'center',
+          borderRadius: 10,
         },
         tabsContainer: {
-            flexDirection: 'row',
-            // Fixed width for simplicity (100px per tab)
+          flexDirection: 'row',
         },
         tab: {
-            width: TAB_WIDTH,
-            alignItems: 'center',
-            justifyContent: 'center',
+          width: TAB_WIDTH,
+          alignItems: 'center',
+          justifyContent: 'center',
         },
         tabText: {
-            color: colors.text,
-            fontSize: 16,
+          color: colors.text,
+          fontSize: 16,
         },
         activeTabText: {
-            color: '#fff',
-            fontWeight: 'bold',
-            fontSize: 16,
+          color: '#fff',
+          fontWeight: 'bold',
+          fontSize: 16,
         },
         highlight: {
-            position: 'absolute',
-            width: 90,
-            height: '80%',
-            backgroundColor: colors.primary,
-            borderRadius: 10,
-            right:5,
-            left:5
-        
+          position: 'absolute',
+          width: 90,
+          height: '80%',
+          backgroundColor: colors.primary,
+          borderRadius: 10,
+          right: 5,
+          left: 5,
         },
         content: {
-            marginTop: 20,
+          marginTop: 20,
         },
-        
         contentText: {
-            fontSize: 18,
-            color: 'colors.text',
+          fontSize: 18,
+          color: colors.text,
         },
-        });
+      });
 
-        export default TabBar;
-
+      export default AnimatedTabs;
 
      ```
     
 </Steps>
+
+
+</TabItem>
+
+</Tabs>
+
 
  
 

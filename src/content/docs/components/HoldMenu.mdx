@@ -10,9 +10,14 @@ A button which changes it's appearance if tapped
 
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 import { Code } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
 
 export const exampleCode = `import { Text, SafeAreaView, StyleSheet, View, TouchableOpacity,Alert } from 'react-native';
 import HoldMenu from '../components/holdMenu';
+
+//or if you're using npm package
+//import HoldMenu from '@cascadeui/hold-menu'
+
   const menuItems = [
     {
       id: '1',
@@ -58,7 +63,17 @@ export const highlights = ['file', 'CMS'];
 
 ## Installation
 
-import { Steps } from '@astrojs/starlight/components';
+<Tabs>
+
+<TabItem label='cli'>
+
+     ```bash
+    npm install @cascadeui/hold-menu
+    ```
+
+</TabItem>
+
+<TabItem label='manual'>
 
 <Steps>
 
@@ -258,6 +273,12 @@ import { Steps } from '@astrojs/starlight/components';
      ```
     
 </Steps>
+
+
+</TabItem>
+
+</Tabs>
+
 
  
 

@@ -5,15 +5,16 @@ description: A reference page in my new Starlight docs site.
 
 A button which changes it's appearance if tapped
 
-
-
-
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 import { Code } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
 
 export const exampleCode = `import { StyleSheet, View } from 'react-native'
 import React from 'react'
 import CircularProgress from '../components/circularProgress'
+
+//or if you're using npm package
+//import {CircularProgress} from '@cascadeui/circular-progress'
 
 const App = () => {
   return (
@@ -36,9 +37,17 @@ export const highlights = ['file', 'CMS'];
 </Tabs>
 
 ## Installation
+<Tabs>
 
-import { Steps } from '@astrojs/starlight/components';
+<TabItem label='cli'>
 
+     ```bash
+    npm install @cascadeui/circular-progress
+    ```
+
+</TabItem>
+
+<TabItem label='manual'>
 <Steps>
   1. **Install `react-native-svg`**
      <Tabs>
@@ -145,6 +154,11 @@ import { Steps } from '@astrojs/starlight/components';
     
 </Steps>
 
+</TabItem>
+
+</Tabs>
+
+
  
 
 
@@ -164,7 +178,10 @@ import { Steps } from '@astrojs/starlight/components';
 
 export const example = `import { StyleSheet, View } from 'react-native'
 import React from 'react'
-import CircularProgress from '../components/circularProgressNum'
+import CircularProgressNumber from '../components/circularProgressNum'
+
+//or if you're using npm
+//import {CircularProgressNumber} from '@cascadeui/circular-progress'
 
 const App = () => {
   return (
@@ -186,6 +203,15 @@ export const highlight = ['file', 'CMS'];
   <TabItem label="Code"><Code code={example} lang="js" title={file} mark={highlight} /></TabItem>
 </Tabs>
 
+<Tabs>
+
+<TabItem label='cli'>
+     ```bash
+    npm install @cascadeui/circular-progress
+    ```
+</TabItem>
+
+<TabItem label='manual'>
 **Copy core component `src/components/circularProgressNum.tsx`**
      ```tsx
         import React, { useEffect, useRef } from 'react';
@@ -194,7 +220,7 @@ export const highlight = ['file', 'CMS'];
 
         const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
-        const CircularProgressNum = ({
+        const CircularProgressNumber = ({
         size = 100,
         strokeWidth = 10,
         progress = 0,
@@ -264,10 +290,16 @@ export const highlight = ['file', 'CMS'];
         },
         });
 
-        export default CircularProgressNum;
+        export default CircularProgressNumber;
 
 
      ```
+
+</TabItem>
+
+</Tabs>
+
+
 ## Props
 
 | Prop      | Type     | Description                          |

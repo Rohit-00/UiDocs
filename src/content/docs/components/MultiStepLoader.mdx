@@ -10,10 +10,14 @@ Enhance user experience with captivating Multi-Step Loader, guiding users throug
 
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 import { Code } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
 
 export const exampleCode = `import { StyleSheet, Text, View, Button } from 'react-native'
 import React, { useState } from 'react'
 import { MultiStepLoader } from '../components/multiStepLoader'
+
+//or if you're using npm package
+//import { MultiStepLoader } from '@cascadeui/multistep-loader'
 
 const App = () => {
 
@@ -52,7 +56,34 @@ export const highlights = ['file', 'CMS'];
 
 ## Installation
 
-import { Steps } from '@astrojs/starlight/components';
+<Tabs>
+
+<TabItem label='cli'>
+
+<Steps>
+1. **Install component**
+     ```bash
+    npm install @cascadeui/multistep-loader
+    ```
+2. **Add react-native-reanimated plugin into `babel.config`**
+      ```js
+        module.exports = {
+          presets: [
+            ... // don't add it here :)
+          ],
+          plugins: [
+            ...
+            'react-native-reanimated/plugin',
+          ],
+        };
+      ```
+</Steps>
+
+</TabItem>
+
+<TabItem label='manual'>
+
+</TabItem>
 
 <Steps>
   1. **Install React Native Reanimated**
@@ -237,6 +268,11 @@ import { Steps } from '@astrojs/starlight/components';
      ```
     
 </Steps>
+
+
+</Tabs>
+
+
 
  
 

@@ -8,10 +8,14 @@ An easy to integrate onboarding screens with smooth color interpolation. Just pa
 
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 import { Code } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
 
 export const exampleCode = `import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
-import OnboardAnimation from '../src/components/onboardAnimation'
+import OnboardScreens from '../src/components/OnboardScreens'
+
+//or if you're using npm package
+//import {OnboardScreens} from '@cascadeui/onboard-screens'
 
 const App = () => {
     const pages = [
@@ -37,7 +41,7 @@ const App = () => {
 
   return (
     <View>
-     <OnboardAnimation 
+     <OnboardScreens 
       Pages={pages} 
       backgroundColors={['#FFEAA9','#CFEAD7','#D7EDFF']}
       onDone={()=>console.log('hello')}
@@ -64,7 +68,32 @@ export const highlights = ['file', 'CMS'];
 
 ## Installation
 
-import { Steps } from '@astrojs/starlight/components';
+<Tabs>
+
+<TabItem label='cli'>
+
+<Steps>
+1. **Install component**
+     ```bash
+    npm install @cascadeui/onboard-screens
+    ```
+2. **Add react-native-reanimated plugin into `babel.config`**
+      ```js
+        module.exports = {
+          presets: [
+            ... // don't add it here :)
+          ],
+          plugins: [
+            ...
+            'react-native-reanimated/plugin',
+          ],
+        };
+      ```
+</Steps>
+
+</TabItem>
+
+<TabItem label='manual'>
 
 <Steps>
   1. **Install React Native Reanimated**
@@ -97,7 +126,7 @@ import { Steps } from '@astrojs/starlight/components';
           ],
         };
       ```
-  3. **Copy core component `src/components/onboardAnimation.tsx`**
+  3. **Copy core component `src/components/OnboardScreens.tsx`**
      ```tsx
         import { Dimensions, StyleSheet, Text, TouchableOpacity, View, ImageSourcePropType } from 'react-native'
         import React, { useRef, useState} from 'react'
@@ -123,7 +152,7 @@ import { Steps } from '@astrojs/starlight/components';
             nextButton?:React.ReactNode
         }
 
-        const OnboardAnimation : React.FC<MyComponentProps> = ({
+        const OnboardScreens : React.FC<MyComponentProps> = ({
         Pages,
         backgroundColors,
         onDone,
@@ -256,7 +285,7 @@ import { Steps } from '@astrojs/starlight/components';
         )
         }
 
-        export default OnboardAnimation
+        export default OnboardScreens
 
         const styles = StyleSheet.create({
             container:{
@@ -327,6 +356,12 @@ import { Steps } from '@astrojs/starlight/components';
 </Steps>
 
  
+
+</TabItem>
+
+</Tabs>
+
+
 
 
 ## Props
