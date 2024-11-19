@@ -4,11 +4,18 @@ import starlight from '@astrojs/starlight';
 
 // https://astro.build/config
 export default defineConfig({
+	
 	integrations: [
-		starlight({
+		starlight(
+			{
+			
 			title: 'Cascade UI',
+			customCss: [
+				'./src/styles/custom.css',
+			  ],
 			social: {
-				github: 'https://github.com/withastro/starlight',
+				github: 'https://github.com/Rohit-00/cascade',
+				twitter: 'https://x.com/byir0nic'
 			},
 			sidebar: [
 				
@@ -16,7 +23,11 @@ export default defineConfig({
 				{
 					label: 'Components',
 					autogenerate: { directory: 'components' },
+
 				},
+			
+				
+				
 			],
 			
 		}),
